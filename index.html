@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memoriza · RVR60 — Juego de Versículos Bíblicos</title>
+  <meta name="description" content="App profesional para memorizar versículos de la Biblia RVR60 con quizzes de opción múltiple, escribir el texto, flashcards y estadísticas." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <!-- ===================== HOME ===================== -->
+  <main id="screen-home" class="screen active">
+    <header class="hero">
+      <div class="hero-badge">Reina-Valera 1960</div>
+      <h1 class="hero-title">Memoriza<span>·</span>RVR60</h1>
+      <p class="hero-sub">Domina cientos de versículos con juegos inteligentes: opción múltiple, escribir el texto y tarjetas de estudio.</p>
+      <div class="stats-strip" id="home-stats">
+        <div class="sstat"><b id="hs-total">0</b><span>versículos</span></div>
+        <div class="sstat"><b id="hs-mastered">0</b><span>dominados</span></div>
+        <div class="sstat"><b id="hs-streak">0</b><span>racha</span></div>
+        <div class="sstat"><b id="hs-points">0</b><span>puntos</span></div>
+      </div>
+    </header>
+
+    <section class="panel">
+      <h2 class="panel-title">Elige tu modo de juego</h2>
+      <div class="mode-grid">
+        <button class="mode-card" data-mode="choice">
+          <div class="mode-emoji">🎯</div>
+          <div class="mode-name">Opción múltiple</div>
+          <div class="mode-desc">Lee la referencia y elige el texto correcto entre 4 opciones.</div>
+        </button>
+        <button class="mode-card" data-mode="reference">
+          <div class="mode-emoji">📖</div>
+          <div class="mode-name">¿Qué versículo es?</div>
+          <div class="mode-desc">Lee el texto completo y elige la referencia correcta.</div>
+        </button>
+        <button class="mode-card" data-mode="write">
+          <div class="mode-emoji">✍️</div>
+          <div class="mode-name">Escribe el texto</div>
+          <div class="mode-desc">Se muestra la referencia: escribe el versículo de memoria.</div>
+        </button>
+        <button class="mode-card" data-mode="fill">
+          <div class="mode-emoji">🧩</div>
+          <div class="mode-name">Completa la frase</div>
+          <div class="mode-desc">Un hueco en blanco: elige la palabra que lo completa.</div>
+        </button>
+        <button class="mode-card" data-mode="flash">
+          <div class="mode-emoji">🗂️</div>
+          <div class="mode-name">Tarjetas de estudio</div>
+          <div class="mode-desc">Repasa sin presión: revela la respuesta cuando quieras.</div>
+        </button>
+        <button class="mode-card" data-mode="speed">
+          <div class="mode-emoji">⚡</div>
+          <div class="mode-name">Ráfaga relámpago</div>
+          <div class="mode-desc">10 preguntas contrarreloj. Cada error resta tiempo.</div>
+        </button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2 class="panel-title">Filtrar por categoría</h2>
+      <div class="chip-row" id="cat-chips"></div>
+      <div class="panel-actions">
+        <button class="btn btn-ghost" id="btn-daily">📅 Reto del día</button>
+        <button class="btn btn-ghost" id="btn-reset">↺ Reiniciar progreso</button>
+      </div>
+    </section>
+
+    <footer class="foot">Hecho con fe y código · Textos de la Biblia RVR60</footer>
+  </main>
+
+  <!-- ===================== QUIZ ===================== -->
+  <main id="screen-quiz" class="screen">
+    <header class="quiz-top">
+      <button class="icon-btn" id="btn-exit" aria-label="Salir">✕</button>
+      <div class="quiz-progress">
+        <div class="qp-bar"><div class="qp-fill" id="qp-fill"></div></div>
+        <span id="qp-text">1 / 10</span>
+      </div>
+      <div class="quiz-score">
+        <span class="pill pill-streak" id="pill-streak">🔥 0</span>
+        <span class="pill pill-pts" id="pill-pts">0 pts</span>
+        <span class="pill pill-timer" id="pill-timer"></span>
+      </div>
+    </header>
+
+    <section class="quiz-body">
+      <div class="q-category" id="q-category-tag"></div>
+
+      <!-- Multiple choice: text options -->
+      <div class="q-block" id="q-block-choice">
+        <div class="q-prompt" id="q-prompt-choice"></div>
+        <div class="options" id="options-choice"></div>
+      </div>
+
+      <!-- Multiple choice: reference options -->
+      <div class="q-block" id="q-block-reference">
+        <div class="q-verse-big" id="q-verse-ref"></div>
+        <div class="options options-refs" id="options-reference"></div>
+      </div>
+
+      <!-- Fill blank -->
+      <div class="q-block" id="q-block-fill">
+        <div class="q-prompt" id="q-prompt-fill"></div>
+        <div class="options options-words" id="options-fill"></div>
+      </div>
+
+      <!-- Write mode -->
+      <div class="q-block" id="q-block-write">
+        <div class="q-prompt q-prompt-ref" id="q-prompt-write"></div>
+        <textarea id="write-input" class="write-input" placeholder="Escribe aquí el versículo…" spellcheck="false" autocomplete="off"></textarea>
+        <div class="write-actions">
+          <button class="btn btn-primary" id="btn-check-write">Comprobar</button>
+          <button class="btn btn-ghost" id="btn-skip-write">No lo sé</button>
+        </div>
+        <div class="hint" id="write-hint">Pista: se aceptan mayúsculas/minúsculas y tildes opcionales.</div>
+      </div>
+
+      <!-- Flashcard -->
+      <div class="q-block" id="q-block-flash">
+        <div class="flash-wrap">
+          <div class="flash-card" id="flash-card">
+            <div class="flash-face flash-front" id="flash-front"></div>
+            <div class="flash-face flash-back" id="flash-back"></div>
+          </div>
+        </div>
+        <div class="flash-actions">
+          <button class="btn btn-ghost" id="btn-flash-reveal">👁️ Mostrar respuesta</button>
+          <div class="flash-grade hidden" id="flash-grade">
+            <button class="btn btn-warn" data-grade="0">😖 Difícil</button>
+            <button class="btn btn-ok" data-grade="1">🙂 Bien</button>
+            <button class="btn btn-great" data-grade="2">🌟 ¡Lo sé!</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feedback -->
+      <div class="feedback hidden" id="feedback">
+        <div class="fb-head" id="fb-head"></div>
+        <div class="fb-verse" id="fb-verse"></div>
+        <button class="btn btn-primary" id="btn-next">Siguiente →</button>
+      </div>
+    </section>
+
+    <footer class="quiz-foot">
+      <div class="mode-label" id="mode-label"></div>
+      <button class="btn btn-ghost btn-small" id="btn-giveup">Rendirse</button>
+    </footer>
+  </main>
+
+  <!-- ===================== RESULTS ===================== -->
+  <main id="screen-results" class="screen">
+    <section class="results-card">
+      <div class="results-emoji" id="res-emoji">🏆</div>
+      <h1 class="results-title" id="res-title">¡Muy bien!</h1>
+      <div class="results-score" id="res-score">80%</div>
+      <div class="results-grid" id="res-grid"></div>
+      <div class="results-xp" id="res-xp"></div>
+      <div class="results-actions">
+        <button class="btn btn-primary" id="btn-again">🔁 Jugar otra vez</button>
+        <button class="btn btn-ghost" id="btn-home">🏠 Menú principal</button>
+      </div>
+      <div class="missed-wrap" id="missed-wrap">
+        <h3>Versículos para repasar</h3>
+        <ul class="missed-list" id="missed-list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- ===================== LIBRARY ===================== -->
+  <main id="screen-library" class="screen">
+    <header class="lib-top">
+      <button class="icon-btn" id="btn-lib-back" aria-label="Volver">←</button>
+      <h2>Biblioteca de versículos</h2>
+      <div class="lib-count" id="lib-count"></div>
+    </header>
+    <div class="lib-search">
+      <input type="search" id="lib-search-input" placeholder="Buscar por referencia o palabra…" />
+      <div class="chip-row chip-row-small" id="lib-chips"></div>
+    </div>
+    <div class="lib-grid" id="lib-grid"></div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="verses.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
